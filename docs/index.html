@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaosStream - Mathematical Chaos-Based Encryption</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="logo">ChaosStream</div>
+            <ul>
+                <li><a href="#mathematical-foundation">Mathematics</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#implementation">Implementation</a></li>
+                <li><a href="#analysis">Analysis</a></li>
+                <li><a href="#implementation-guide">Implementation Guide</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero">
+            <div class="implementation-info">
+                <span class="language-badge">Implemented in C</span>
+                <span class="version">Version 1.0</span>
+            </div>
+            <h1>ChaosStream</h1>
+            <p class="subtitle">A high-performance chaos-based cryptographic system</p>
+            <div class="author-banner">
+                <div class="author-tag">
+                    <span class="designer">Designed & Implemented by</span>
+                    <span class="author-main">Enigmatikk</span>
+                    <span class="author-name">Hornoiu Dragos Ionut</span>
+                </div>
+            </div>
+            <div class="social-links">
+                <a href="https://github.com/Enigmatikk/ChaosStream/" class="social-button github" target="_blank">
+                    <svg height="20" width="20" viewBox="0 0 16 16">
+                        <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                    </svg>
+                    GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/dragosionut1" class="social-button linkedin" target="_blank">
+                    <svg height="20" width="20" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                    LinkedIn
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="mathematical-foundation">
+            <h2>Mathematical Foundation</h2>
+            <div class="math-block">
+                <h3>Core Components</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    \text{Block Size} &= 64 \text{ bytes} = 512 \text{ bits} \\
+                    \text{Key Size} &= 32 \text{ bytes} = 256 \text{ bits} \\
+                    \text{IV Size} &= 16 \text{ bytes} = 128 \text{ bits} \\
+                    \text{Rounds} &= 8 \\
+                    \text{S-Box Size} &= 256 \text{ bytes} \\
+                    \text{Diffusion Matrix} &= 4 \times 4 \text{ (32-bit elements)}
+                    \end{aligned}
+                </div>
+
+                <h3>Chaotic System</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    x_{n+1} &= r \cdot x_n(1-x_n), \quad r = \text{CHAOSSTREAM\_LOGISTIC\_R} \\
+                    x_n &\in (0,1), \quad x_n = 0.5 \text{ if } x_n \notin (0,1) \\
+                    \text{Initial } x_0 &= \frac{\text{hash}(\text{key} \| \text{iv})}{2^{32}} \\
+                    \text{hash}(m) &= \bigoplus_{i=0}^{\lfloor len/4 \rfloor} \text{rotl}(m_i + \phi, 13)
+                    \end{aligned}
+                </div>
+
+                <h3>Key Processing</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    \text{RoundKey}_{i,j} &= \text{Mix}(L_j, K_j \oplus (i \cdot \phi)) \\
+                    L_j &= \lfloor x_j \cdot 2^{32} \rfloor \text{ (Logistic value)} \\
+                    K_j &= \text{key\_words}[j \bmod 8] \text{ (32-bit key word)} \\
+                    \phi &= \text{GOLDEN\_RATIO} = \frac{1 + \sqrt{5}}{2} \\
+                    \text{key\_words}[i] &= \text{load32\_le}(\text{key} + 4i) \\
+                    \text{Mix}(a,b,c) &= \text{RotL}(a \oplus b, 7) + c
+                    \end{aligned}
+                </div>
+
+                <h3>S-Box Generation</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    \text{Initialize: } & S[i] = i, \quad \forall i \in [0,255] \\
+                    \text{Shuffle: } & j = (j + S[i] + \text{Key}[i \bmod 32]) \bmod 256 \\
+                    & S[i] \leftrightarrow S[j] \text{ (Swap operation)} \\
+                    \text{Inverse: } & \text{InvS}[S[i]] = i, \quad \forall i \in [0,255] \\
+                    \text{Apply: } & y = S[x] \text{ (Forward)} \\
+                    & x = \text{InvS}[y] \text{ (Inverse)}
+                    \end{aligned}
+                </div>
+
+                <h3>Block Processing</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    \text{Mix}(a,b,c) &= \text{RotL}(a \oplus b, 7) + c \\
+                    \text{RotL}(x,n) &= (x \ll n) \mid (x \gg (32-n)) \\
+                    \text{Block}_i &= \text{Mix}(\text{Block}_{i-1}, \text{RoundKey}_r) \\
+                    \text{Diffusion}(x) &= \sum_{j=0}^3 M_{i,j} \cdot x_j \bmod 2^{32}
+                    \end{aligned}
+                </div>
+
+                <h3>SIMD Optimizations</h3>
+                <div class="katex-display">
+                    \begin{aligned}
+                    \text{AVX2: } & 8 \text{ blocks } \times 64 \text{ bytes} = 512 \text{ bytes/iteration} \\
+                    \text{SSE2: } & 4 \text{ blocks } \times 64 \text{ bytes} = 256 \text{ bytes/iteration} \\
+                    \text{Scalar: } & 1 \text{ block } \times 64 \text{ bytes} = 64 \text{ bytes/iteration}
+                    \end{aligned}
+                </div>
+            </div>
+
+            <div class="comparison-block">
+                <h3>Detailed Comparison with AES-256</h3>
+                <table class="monochrome-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>ChaosStream</th>
+                        <th>AES-256</th>
+                    </tr>
+                    <tr>
+                        <td>Block Size</td>
+                        <td>512 bits (64 bytes)</td>
+                        <td>128 bits (16 bytes)</td>
+                    </tr>
+                    <tr>
+                        <td>Key Size</td>
+                        <td>256 bits (32 bytes)</td>
+                        <td>256 bits (32 bytes)</td>
+                    </tr>
+                    <tr>
+                        <td>Rounds</td>
+                        <td>8 rounds with dynamic operations</td>
+                        <td>14 rounds with fixed operations</td>
+                    </tr>
+                    <tr>
+                        <td>Design</td>
+                        <td>Stream Cipher with Chaotic System<br>Dynamic state evolution<br>Key-dependent operations</td>
+                        <td>Block Cipher with SPN Network<br>Fixed state transitions<br>Static operations</td>
+                    </tr>
+                    <tr>
+                        <td>State Update</td>
+                        <td>Continuous via Logistic Map<br>Non-linear feedback<br>Key-dependent transitions</td>
+                        <td>Fixed SubBytes operation<br>Linear MixColumns<br>Static ShiftRows</td>
+                    </tr>
+                    <tr>
+                        <td>Key Schedule</td>
+                        <td>Dynamic generation using chaos<br>Continuous key evolution<br>Non-linear expansion</td>
+                        <td>Static Rcon-based schedule<br>Fixed expansion pattern<br>Linear key derivation</td>
+                    </tr>
+                    <tr>
+                        <td>Parallelization</td>
+                        <td>Software SIMD (AVX2/SSE2)<br>Multi-threading support<br>Dynamic block processing</td>
+                        <td>Hardware AES-NI<br>Fixed instruction set<br>ECB/CTR parallelization</td>
+                    </tr>
+                    <tr>
+                        <td>S-Box</td>
+                        <td>Key-dependent 256-byte table<br>Dynamic generation<br>Inverse computation</td>
+                        <td>Fixed GF(2⁸) inverse mapping<br>Affine transformation<br>Static lookup table</td>
+                    </tr>
+                    <tr>
+                        <td>Diffusion</td>
+                        <td>Dynamic 4x4 matrix<br>32-bit word operations<br>Key-dependent mixing</td>
+                        <td>Fixed MixColumns matrix<br>8-bit operations<br>Static coefficients</td>
+                    </tr>
+                    <tr>
+                        <td>Security Properties</td>
+                        <td>Chaos-based security<br>Dynamic avalanche effect<br>Key-dependent patterns</td>
+                        <td>Algebraic security<br>Fixed diffusion patterns<br>Proven resistance</td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td>Optimized for modern CPUs<br>Larger blocks, fewer rounds<br>Software acceleration</td>
+                        <td>Hardware optimization<br>Smaller blocks, more rounds<br>Dedicated instructions</td>
+                    </tr>
+                </table>
+
+                <div class="key-differences">
+                    <h4>Key Architectural Differences:</h4>
+                    <ul>
+                        <li><strong>State Evolution:</strong> ChaosStream employs a continuous, chaotic state evolution through the logistic map (xₙ₊₁ = r·xₙ(1-xₙ)), creating unpredictable, key-dependent transformations. AES uses fixed, predetermined state transitions through its SPN network.</li>
+                        <li><strong>Block Processing:</strong> ChaosStream processes 512-bit blocks using 32-bit word operations and dynamic matrices, optimized for modern CPU architectures. AES operates on 128-bit blocks using 8-bit operations and fixed transformations.</li>
+                        <li><strong>Key Integration:</strong> ChaosStream deeply integrates the key into its operations, affecting the S-Box, diffusion matrix, and state evolution. AES uses the key primarily in AddRoundKey operations with a fixed key schedule.</li>
+                        <li><strong>Performance Design:</strong> ChaosStream is designed for software optimization with SIMD and multi-threading, processing larger blocks with fewer rounds. AES is optimized for hardware implementation with dedicated instructions (AES-NI).</li>
+                        <li><strong>Security Model:</strong> ChaosStream bases its security on chaos theory and dynamic systems, creating key-dependent transformations. AES relies on proven algebraic structures and fixed transformations with established security properties.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <h2>System Architecture</h2>
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart LR
+    %% Input Section
+    subgraph Input ["Input Processing"]
+        K["256-bit Key"] --> KE["Key Expansion"]
+        IV["128-bit IV"] --> KE
+    end
+
+    %% Key Processing
+    subgraph KeyGen ["Key Generation"]
+        KE --> RK["Round Keys"]
+        KE --> SB["S-Box"]
+        KE --> DM["Diffusion"]
+        
+        %% Chaotic System
+        LM["Logistic Map"]
+        RK <--> LM
+    end
+
+    %% Encryption Process
+    subgraph Encrypt ["Encryption"]
+        P["Plaintext"] --> BLK["Block Process"]
+        RK --> BLK
+        SB --> BLK
+        DM --> BLK
+        BLK --> XOR["Mix & XOR"]
+        XOR --> C["Ciphertext"]
+    end
+
+    %% SIMD Optimization
+    subgraph Opt ["Optimizations"]
+        direction TB
+        AVX["SIMD (AVX2/SSE2)"]
+        THR["Multi-threading"]
+        AVX --> BLK
+        THR --> BLK
+    end
+
+    %% Styling
+    classDef input fill:#262626,stroke:#ffffff,stroke-width:2px
+    classDef process fill:#1a1a1a,stroke:#ffffff,stroke-width:2px
+    classDef state fill:#333333,stroke:#ffffff,stroke-width:2px
+    classDef opt fill:#404040,stroke:#ffffff,stroke-width:2px
+
+    class K,IV,P,C input
+    class KE,RK,SB,DM,BLK,XOR process
+    class LM state
+    class AVX,THR opt
+                </div>
+            </div>
+        </section>
+
+        <section id="implementation">
+            <h2>Implementation Details</h2>
+            <div class="code-block">
+                <h3>Core Encryption Process</h3>
+                <pre><code>// Initialize chaotic state
+x = initial_state;
+for (int round = 0; round < ROUNDS; round++) {
+    // Generate chaotic value
+    x = r * x * (1 - x);
+    
+    // Apply non-linear transformation
+    state = mix(state, x);
+    
+    // Apply S-box substitution
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        state[i] = sbox[state[i]];
+    }
+    
+    // Mix with round key
+    state ^= generate_round_key(x);
+}</code></pre>
+            </div>
+
+            <div class="optimization-block">
+                <h3>Performance Optimizations</h3>
+                <ul>
+                    <li>→ SIMD vectorization (AVX2/SSE2)</li>
+                    <li>→ Cache-aligned memory access</li>
+                    <li>→ Branch-free operations</li>
+                    <li>→ Parallel block processing</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="implementation-guide">
+            <h2>Implementation Guide</h2>
+            <div class="implementation-block">
+                <h3>Integration Methods</h3>
+                <div class="integration-options">
+                    <div class="option">
+                        <h4>1. Static Library</h4>
+                        <pre class="code-block">gcc -c ChaosStream.c -o ChaosStream.o
+ar rcs libchaosstream.a ChaosStream.o</pre>
+                        <p>Link with: <code>-lchaosstream</code></p>
+                    </div>
+                    <div class="option">
+                        <h4>2. Shared Library</h4>
+                        <pre class="code-block">gcc -shared -fPIC ChaosStream.c -o libchaosstream.so</pre>
+                        <p>Link with: <code>-lchaosstream</code></p>
+                    </div>
+                    <div class="option">
+                        <h4>3. Direct Source Integration</h4>
+                        <pre class="code-block">// Include in your project
+#include "ChaosStream.h"</pre>
+                    </div>
+                </div>
+
+                <h3>Usage Examples</h3>
+                <div class="example-block">
+                    <h4>File Encryption</h4>
+                    <pre class="code-block">
+#include "ChaosStream.h"
+
+void encrypt_file(const char* input_file, const char* output_file) {
+    uint8_t key[32], iv[16];
+    // Generate secure key and IV
+    chaosstream_generate_key(key);
+    chaosstream_generate_iv(iv);
+    
+    // Create context
+    ChaosStreamContext* ctx = chaosstream_create();
+    chaosstream_init(ctx, key, iv);
+    
+    // Read file and encrypt
+    // ... (file handling code)
+    
+    chaosstream_free(ctx);
+}</pre>
+                </div>
+
+                <h3>Real-World Applications</h3>
+                <ul class="application-list">
+                    <li>
+                        <strong>Secure Communications</strong>
+                        <p>Implement in network protocols for real-time data encryption</p>
+                    </li>
+                    <li>
+                        <strong>File Systems</strong>
+                        <p>Integrate with file system drivers for transparent encryption</p>
+                    </li>
+                    <li>
+                        <strong>Database Security</strong>
+                        <p>Use for column-level encryption in database systems</p>
+                    </li>
+                    <li>
+                        <strong>IoT Devices</strong>
+                        <p>Lightweight encryption for resource-constrained devices</p>
+                    </li>
+                </ul>
+
+                <h3>Performance Considerations</h3>
+                <ul class="performance-list">
+                    <li>Enable SIMD optimizations during compilation for best performance</li>
+                    <li>Use multi-threading for large data sets (>4KB)</li>
+                    <li>Align data to 64-byte boundaries for optimal cache usage</li>
+                    <li>Pre-allocate contexts for repeated operations</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="analysis">
+            <h2>Security Analysis</h2>
+            
+            <div class="analysis-block">
+                <h3>Lyapunov Exponent</h3>
+                <div class="math-content">
+                    <span class="katex-display">
+                        \lambda = \lim_{n \to \infty} \frac{1}{n} \sum_{i=0}^{n-1} \ln |r(1-2x_i)|
+                    </span>
+                    <p>Positive Lyapunov exponent (λ ≈ 0.693) confirms chaotic behavior and sensitivity to initial conditions.</p>
+                </div>
+            </div>
+
+            <div class="analysis-block">
+                <h3>Diffusion Analysis</h3>
+                <div class="math-content">
+                    <span class="katex-display">
+                        P(flip) = \frac{\sum_{i=1}^{n} |C_i \oplus C_i'|}{n}
+                    </span>
+                    <p>Avalanche effect measurement shows approximately 50% bit-flip probability for single-bit input changes.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-signature">
+                <p class="copyright">ChaosStream &copy; 2025</p>
+                <p class="author-signature">
+                    <span class="designer">Created by</span>
+                    <span class="author-main">Enigmatikk</span>
+                    <span class="separator">|</span>
+                    <span class="author-full">Hornoiu Dragos Ionut</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: {
+                curve: 'linear',
+                htmlLabels: true,
+                useMaxWidth: true
+            },
+            themeVariables: {
+                fontFamily: 'SF Mono, monospace',
+                fontSize: '16px',
+                primaryColor: '#ffffff',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#404040',
+                lineColor: '#606060',
+                secondaryColor: '#333333',
+                tertiaryColor: '#262626'
+            }
+        });
+
+        document.querySelectorAll('.katex-display').forEach(element => {
+            katex.render(element.textContent, element, {
+                displayMode: true,
+                throwOnError: false,
+                output: 'html'
+            });
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
