@@ -1,4 +1,9 @@
-![ChaosStream Logo](assets/logo.png)
+
+
+
+[![ChaosStream](https://img.shields.io/badge/🔐_ChaosStream-1.0.0-2962FF?style=for-the-badge&logo=github&logoColor=white)](https://github.com/EnigmaTikk/ChaosStream)
+[![Documentation](https://img.shields.io/badge/📚_Documentation-View_Online-2962FF?style=for-the-badge&logo=readthedocs&logoColor=white)](https://enigmatikk.github.io/ChaosStream/)
+
 
 A high-performance chaos-based cryptographic system designed for modern applications. ChaosStream combines the unpredictability of chaotic systems with efficient implementation for secure data encryption.
 
